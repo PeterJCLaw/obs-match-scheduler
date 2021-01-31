@@ -152,6 +152,7 @@ def script_update(settings):
         thread = Listener(stream_url, video_path)
         thread.start()
 
+        # TODO: not * 100 here, once we're confident of not spamming OBS
         obs.timer_add(update_match_video, interval * 100)
 
 def script_defaults(settings):
