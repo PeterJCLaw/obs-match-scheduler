@@ -85,6 +85,8 @@ def update_match_video():
         print(f"{path!r} has already played")
         return
 
+    # TODO: can we pull the current video from the source? I tried this but
+    # couldn't work out how.
     last_video_path = path
     print(f"Updating to {path!r}")
 
