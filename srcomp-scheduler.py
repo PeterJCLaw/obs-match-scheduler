@@ -105,6 +105,11 @@ def update_match_video():
             # refresh if the source is currently active
             obs.obs_source_update(source, settings)
 
+            # TODO: this ends up resetting the size of the video within OBS. Can
+            # we inspect the source beforehand and preserve the apparent size?
+            # Might be moot if all our videos are the same size and we're
+            # showing them at 100% scale, but would be good to sort properly.
+
         elif source_id == "vlc_source":
             # "playlist"
             array = obs.obs_data_array_create()
