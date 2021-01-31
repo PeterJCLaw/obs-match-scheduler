@@ -12,6 +12,8 @@ T = TypeVar('T')
 
 MY_DIR = pathlib.Path(__file__).parent.resolve()
 
+# TODO: replace this with inference of the file names from user settings in
+# combination with the match numbers from the stream.
 VIDEOS = [
     str(MY_DIR / 'giphy480p.mp4'),
     str(MY_DIR / 'match-0.mp4'),
@@ -73,6 +75,10 @@ def update_match_video():
     global last_video_path
 
     print('update_match_video')
+
+    # TODO: actually set the video starting at the start of the game, rather
+    # than the slot. Also involves ensuring that our timings are in step with
+    # the compbox.
 
     path = video_path.get()
     if last_video_path == path:
