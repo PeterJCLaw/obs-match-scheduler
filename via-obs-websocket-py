@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+import logging
+import pathlib
+import sys
+import time
+
+from obswebsocket import events, obsws, requests
+
+MY_DIR = pathlib.Path(__file__).parent.resolve()
+
+# TODO: replace this with inference of the file names from user settings in
+# combination with the match numbers from the stream.
+VIDEOS = [
+    str(MY_DIR / 'giphy480p.mp4'),
+    str(MY_DIR / 'match-0.mp4'),
+]
+
+
+logging.basicConfig(level=logging.WARNING)
+
+PLAY = False
+PAUSE = True
+
+host = "localhost"
+port = 4444
+password = "beeeeees"
+
+
+def on_event(message):
+    print(u"Got message: {}".format(message))
+
+
+def on_switch(message):
+    print(u"You changed the scene to {}".format(message.getSceneName()))
+
+
+ws = obsws(host, port, password)
+ws.register(on_event)
+ws.register(on_switch, events.SwitchScenes)
+ws.connect()
+
+video_info = ws.call(requests.GetVideoInfo())
+
+def get_source(name):
+    sources = ws.call(requests.GetSourcesList())
+    return next(
+        s
+        for s in sources.getSources()
+        if s['name'] == name
+    )
+
+# bees_source = get_source('Bees')
+
+result = ws.call(requests.GetSourceSettings('Bees'))
+bees_settings = result.getSourceSettings()
+print(bees_settings)
+
+# bees_settings['local_file'] = VIDEOS[0]
+
+# print(ws.call(requests.SetSourceSettings('Bees', bees_settings)))
+# print(ws.call(requests.PlayPauseMedia('Bees', PAUSE)))
+# time.sleep(1)
+# print(ws.call(requests.PlayPauseMedia('Bees', PLAY)))
+
+# print(ws.call(requests.GetSceneItemList('Scripted')))
+# print(ws.call(requests.GetSceneItemProperties({'name': 'Bees'}, scene_name='Scripted')))
+print('PAUSE')
+print(ws.call(requests.PlayPauseMedia('Bees', PAUSE)))
+time.sleep(3)
+
+print('SetSourceSettings')
+print(ws.call(requests.SetSourceSettings(
+    'Bees',
+    {
+        'local_file': VIDEOS[0],
+        'looping': False,
+        'restart_on_activate': False,
+        'clear_on_media_end': False,
+    },
+)))
+time.sleep(3)
+
+print('SetSceneItemProperties')
+print(ws.call(requests.SetSceneItemProperties(
+    {'name': 'Bees'},
+    bounds={
+        'type': 'OBS_BOUNDS_SCALE_INNER',
+        'x': video_info.getBaseWidth(),
+        'y': video_info.getBaseHeight(),
+    },
+)))
+print("--- Set ---")
+time.sleep(3)
+print("--- Play ---")
+print(ws.call(requests.PlayPauseMedia('Bees', PLAY)))
+# print(ws.call(requests.GetSceneItemProperties({'name': 'Bees'}, scene_name='Scripted')))
+
+# try:
+
+#     while True:
+#         print("OK")
+#         time.sleep(10)
+
+# except KeyboardInterrupt:
+#     pass
+
+ws.disconnect()
