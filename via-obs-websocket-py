@@ -82,10 +82,14 @@ print(ws.call(requests.SetSourceSettings(
     },
 )))
 time.sleep(3)
+# TODO: work out how to prevent the media from starting playback immediately,
+# so that we can signal that separately.
 
 print('SetSceneItemProperties')
 print(ws.call(requests.SetSceneItemProperties(
     {'name': 'Bees'},
+    # Setting the bounds here means that the media will fill the canvas,
+    # preserving its aspect ratio.
     bounds={
         'type': 'OBS_BOUNDS_SCALE_INNER',
         'x': video_info.getBaseWidth(),
